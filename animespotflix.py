@@ -53,7 +53,7 @@ class AnimeScraper:
 
     # STATIC METHOD
     def searchAnime(query='anime name'):
-        response_text = requests.get('https://www.gogoanime.so/search.html?keyword={}'.format(query.replace(' ', '%20'))).text
+        response_text = requests.get('https://www1.gogoanime.ai/search.html?keyword={}'.format(query.replace(' ', '%20'))).text
         p_results = BeautifulSoup(response_text, 'html.parser').find('ul', class_='items').find_all('p', class_='name')[:4]
         paired_results = [(p.find('a')['title'], 'https://www.gogoanime.so{}'.format(p.find('a')['href'])) for p in p_results]
         return paired_results # (title, url) pair list is returned
