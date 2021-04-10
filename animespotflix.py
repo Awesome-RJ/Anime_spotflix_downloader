@@ -29,7 +29,7 @@ class AnimeScraper:
         	#re.sub('[<>?":/|]', '', x)
         	#episodeDict['episode-title'] = self.dataDict['anime-title'] + ' - ' + ' '.join(li.text.split())
         	episodeDict['episode-title'] = RegExp.sub('[<>?":/|]', '', '{} - {}'.format(self.dataDict['anime-title'], ' '.join(li.text.split())))
-        	episodeDict['episode-url'] = 'https://www.gogoanime.so{}'.format(li.find('a')['href'].strip())
+        	episodeDict['episode-url'] = 'https://www1.gogoanime.ai{}'.format(li.find('a')['href'].strip())
         	self.dataDict['episodes'].append(episodeDict)
 
     def scrapeEpisodes(self, start=1, end=1):
