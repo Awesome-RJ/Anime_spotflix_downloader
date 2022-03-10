@@ -2,8 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 import re as RegExp
 
-my_headers = {}
-my_headers['user-agent'] = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+my_headers = {
+    'user-agent':
+    'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+}
 
 
 
@@ -11,8 +13,7 @@ my_headers['user-agent'] = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit
 def get_vidcdn_download_link(embed_url):
 	soup = BeautifulSoup(requests.get(embed_url, headers=my_headers).text, 'html.parser')
 	js_text = str(soup.find('div', class_='videocontent'))
-	download_link = RegExp.findall('file: \'(.+?)\'', js_text)[0]
-	return download_link
+	return RegExp.findall('file: \'(.+?)\'', js_text)[0]
 
 
 

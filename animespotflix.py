@@ -3,8 +3,9 @@ from bs4 import BeautifulSoup
 import re as RegExp
 
 
-my_headers = {}
-my_headers['user-agent'] = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+my_headers = {
+    'user-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+}
 
 
 
@@ -25,28 +26,34 @@ class AnimeScraper:
         #------------------------------
         self.dataDict['episodes'] = []
         for li in reversed(ajaxSoup.find_all('li')):
-        	episodeDict = {}
-        	#re.sub('[<>?":/|]', '', x)
-        	#episodeDict['episode-title'] = self.dataDict['anime-title'] + ' - ' + ' '.join(li.text.split())
-        	episodeDict['episode-title'] = RegExp.sub('[<>?":/|]', '', '{} - {}'.format(self.dataDict['anime-title'], ' '.join(li.text.split())))
-        	episodeDict['episode-url'] = 'https://www1.gogoanime.ai{}'.format(li.find('a')['href'].strip())
-        	self.dataDict['episodes'].append(episodeDict)
+            episodeDict = {
+                'episode-title': RegExp.sub(
+                    '[<>?":/|]',
+                    '',
+                    '{} - {}'.format(
+                        self.dataDict['anime-title'], ' '.join(li.text.split())
+                    ),
+                )
+            }
+
+            episodeDict['episode-url'] = 'https://www1.gogoanime.ai{}'.format(li.find('a')['href'].strip())
+            self.dataDict['episodes'].append(episodeDict)
 
     def scrapeEpisodes(self, start=1, end=1):
-    	self.dataDict['scraped-episodes'] = []
-    	for episodeDict in self.dataDict['episodes'][start-1:end]:
-    		scraped_episodeDict = episodeDict
-    		soup = BeautifulSoup(requests.get(episodeDict['episode-url'], headers=my_headers).text, 'html.parser')
-    		serversList = soup.find('div', {'class':'anime_muti_link'}).find_all('li')[1:]
-    		scraped_episodeDict['embed-servers'] = {}
-    		for li in serversList:
-    			embedUrl = li.find('a')['data-video']
-    			if not 'https:' in embedUrl:
-    				embedUrl = f'https:{embedUrl}'
-    			scraped_episodeDict['embed-servers'][li['class'][0]] = embedUrl
-    		#------
-    		self.dataDict['scraped-episodes'].append(scraped_episodeDict)
-    		print('- Collected:', scraped_episodeDict['episode-title'])
+        self.dataDict['scraped-episodes'] = []
+        for episodeDict in self.dataDict['episodes'][start-1:end]:
+            scraped_episodeDict = episodeDict
+            soup = BeautifulSoup(requests.get(episodeDict['episode-url'], headers=my_headers).text, 'html.parser')
+            serversList = soup.find('div', {'class':'anime_muti_link'}).find_all('li')[1:]
+            scraped_episodeDict['embed-servers'] = {}
+            for li in serversList:
+                embedUrl = li.find('a')['data-video']
+                if 'https:' not in embedUrl:
+                    embedUrl = f'https:{embedUrl}'
+                scraped_episodeDict['embed-servers'][li['class'][0]] = embedUrl
+            #------
+            self.dataDict['scraped-episodes'].append(scraped_episodeDict)
+            print('- Collected:', scraped_episodeDict['episode-title'])
 
     def saveJSON(self, filename='anime.json'):
     	open(filename, 'w', encoding='utf-8').write(json.dumps(self.dataDict, indent=4, sort_keys=True, ensure_ascii=False))
@@ -55,8 +62,13 @@ class AnimeScraper:
     def searchAnime(query='anime name'):
         response_text = requests.get('https://www1.gogoanime.ai/search.html?keyword={}'.format(query.replace(' ', '%20'))).text
         p_results = BeautifulSoup(response_text, 'html.parser').find('ul', class_='items').find_all('p', class_='name')[:4]
-        paired_results = [(p.find('a')['title'], 'https://www.gogoanime.so{}'.format(p.find('a')['href'])) for p in p_results]
-        return paired_results # (title, url) pair list is returned
+        return [
+            (
+                p.find('a')['title'],
+                'https://www.gogoanime.so{}'.format(p.find('a')['href']),
+            )
+            for p in p_results
+        ]
 
 
 ######

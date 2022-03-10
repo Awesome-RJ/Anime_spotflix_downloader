@@ -28,7 +28,7 @@ class Downloader:
 				break
 			except KeyboardInterrupt: input("\nDownloader is paused. PRESS [ENTER] TO CONTINUE...")
 		#-------------
-		if os.path.isfile("downloaded/" + filename + ".aria2"):
+		if os.path.isfile(f"downloaded/{filename}.aria2"):
 			open('failed.txt', 'a').write(cmd + '\n')
 
 	def downloadAnime(self):
