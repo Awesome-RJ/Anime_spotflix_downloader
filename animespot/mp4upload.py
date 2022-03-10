@@ -3,8 +3,10 @@ import requests
 import re as RegExp
 
 
-my_headers = {}
-my_headers['user-agent'] = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+my_headers = {
+    'user-agent':
+    'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+}
 
 
 
@@ -17,10 +19,13 @@ def get_mp4upload_download_link(embed_url):
 	videoID = [a for a in evalItems if len(a)>30][0]
 	#
 	evalItems = evalText.split('|')
-	w3strPossiblesList = [s for s in evalItems if RegExp.match('s\d+$', s) or RegExp.match('www\d+$', s)]
-	w3str = "www"
-	if len(w3strPossiblesList) != 0:
+	if w3strPossiblesList := [
+	    s for s in evalItems
+	    if RegExp.match('s\d+$', s) or RegExp.match('www\d+$', s)
+	]:
 		w3str = max(w3strPossiblesList, key=len)
+	else:
+		w3str = "www"
 	#
 	return 'https://{}.mp4upload.com:{}/d/{}/video.mp4'.format(w3str, evalItems[evalItems.index(videoID)+1], videoID)
 
